@@ -20,7 +20,6 @@ void simple_skim() {
   for (Long64_t i=0;i<nentries; i++) {
     oldtree->GetEntry(i);
     if (lep_Pt_0<50000){
-      lep_Pt_0*=pileupEventWeight_090;
       newtree->Fill();
     }
   }
