@@ -6,12 +6,12 @@ void simple_skim() {
   Long64_t nentries = oldtree->GetEntries();
   oldtree->SetBranchStatus("*",0);
   oldtree->SetBranchStatus("lep_Pt_0",1);
-  oldtree->SetBranchStatus( "pileupEventWeight_090"       , 1);
+  oldtree->SetBranchStatus( "pileupEventWeight_090",1);
 
   //oldtree->SetBranchAddress("lep_Pt_0",&event);
 
   Float_t lep_Pt_0; oldtree->SetBranchAddress( "lep_Pt_0", &lep_Pt_0   );
-  Float_t pileupEventWeight_090; oldtree->SetBranchAddress( "pileupEventWeight_090", &pileupEventWeight_090   );
+  Double_t pileupEventWeight_090; oldtree->SetBranchAddress( "pileupEventWeight_090", &pileupEventWeight_090   );
 
   //Create a new file + a clone of old tree in new file
   TFile *newfile = new TFile("small.root","recreate");
