@@ -12,7 +12,8 @@ void weight_checks(){
   Float_t lep_Pt_0[2]; 
   Double_t pileupEventWeight_090[2];
   //string fname[2]={"unw_small.root","hand_w_small.root"};//hand_w_small.root hand_w_after_small.root
-  string fname[2]={"/Users/grevtsov/Documents/working_files/ttH/ttH-ML/TemplateFit/ttbar/acceptance/skim_ntup/source/skim.root","hand_w_small.root"};
+  //string fname[2]={"/Users/grevtsov/Documents/working_files/ttH/ttH-ML/TemplateFit/ttbar/acceptance/skim_ntup/source/skim.root","tth.root"};
+  string fname[2]={"tth.root","tth.root"};
   Long_t entries[2];
   Double_t JVT_EventWeight[2]           ; 
   Float_t scale_nom[2]                  ; 
@@ -21,9 +22,10 @@ void weight_checks(){
   Float_t lepSFObjTight[2]              ; 
   Float_t lepSFTrigTight[2]              ; 
   Int_t RunYear[2];
+  Double_t weightS[2];
 
   Double_t w_tot=1;
-  for (int f=0;f<1;f++){
+  for (int f=0;f<2;f++){
     file_data[f]= TFile::Open(fname[f].c_str());
     tree[f]= (TTree*)file_data[f]->Get("nominal");
     tree[f]->SetBranchAddress( "lep_Pt_0", &lep_Pt_0[f]   );
@@ -38,6 +40,10 @@ void weight_checks(){
     tree[f]->SetBranchAddress( "SherpaNJetWeight"                         , &SherpaNJetWeight[f]               );
     tree[f]->SetBranchAddress( "RunYear"                         , &RunYear[f]               );
   //*/
+
+    //check created by hand weight
+    tree[f]->SetBranchAddress( "weightS", &weightS[f]);
+
     //h_lep_Pt_0[f] = new TH1F("lep_Pt_0_0","lep_Pt_0_0",160,0,80);
     h_lep_Pt_0[f] = new TH1F("lep_Pt_0_0","lep_Pt_0_0",100, 0, 1000);
     
@@ -49,14 +55,14 @@ void weight_checks(){
       w_tot=pileupEventWeight_090[f]*scale_nom[f]*JVT_EventWeight[f]  *MV2c10_70_EventWeight[f] *lepSFObjTight[f] * lepSFTrigTight[f]* SherpaNJetWeight[f] * ( 36074.6*( RunYear[f]==2015 || RunYear[f]==2016 ) + 43813.7*( RunYear[f]==2017 ) );
       if(f==0)
 	h_lep_Pt_0[f]->Fill(lep_Pt_0[f]/1000,w_tot);
-      else h_lep_Pt_0[f]->Fill(lep_Pt_0[f]/1000);
+      else h_lep_Pt_0[f]->Fill(lep_Pt_0[f]/1000,weightS[f]);
     }
   }
 
   TCanvas* canv = new TCanvas("c1", "c1",10,10,800,600);
   canv->cd();
   h_lep_Pt_0[0]->Draw();
-  //h_lep_Pt_0[1]->SetLineColor(2);  h_lep_Pt_0[1]->Draw("same");
+  h_lep_Pt_0[1]->SetLineColor(2);  h_lep_Pt_0[1]->Draw("same");
 
 
 }
