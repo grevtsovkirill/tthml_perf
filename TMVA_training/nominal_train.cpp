@@ -171,9 +171,58 @@ int main( int argc, char **argv )
   // --- end ------------------------------------------------------------
   
   // Apply additional cuts on the signal and background samples (can be different)
-  TCut mycuts;
-  TCut mycutb;
+  TCut mycuts;   TCut mycutb;
   
+  // Tell the factory how to use the training and testing events
+  dataloader->PrepareTrainingAndTestTree( mycuts, mycutb,
+					  "nTest_Signal=0:nTrain_Background=0:NormMode=NumEvents" );
+
+  TString Method_Opt;
+  // ttbar Method_Opt = "!H:!V:NTrees=1000:MinNodeSize=1.5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=10:MaxDepth=1";
+  Method_Opt = "!H:!V:NTrees=1000:MinNodeSize=1.5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:MaxDepth=2";
+    
+  // ---- Book MVA methods
+  factory->BookMethod(  dataloader, TMVA::Types::kBDT, "out_BDTG", Method_Opt);
+  
+  // Train MVAs using the set of training events
+  factory->TrainAllMethods();
+  
+  // ---- Evaluate all MVAs using the set of test events
+  factory->TestAllMethods();
+  
+  // ----- Evaluate and compare performance of all configured MVAs
+  factory->EvaluateAllMethods();
+  
+  // --------------------------------------------------------------
+  
+  // Save the output
+  outputFile->Close();
+  
+  cout << "==> Wrote root file: " << outputFile->GetName() << endl
+	  << "==> TMVAClassificationCategory is done!" << endl
+       << endl
+	  << "==> To view the results, launch the GUI: \"root -l ./TMVAGui.C\"" << endl
+       << endl;
+  
+  cout << "\t number_training_entries_sig = " << number_training_entries_sig << endl;
+  cout << "\t number_test_entries_sig     = " << number_test_entries_sig     << endl;
+  cout << "\t number_training_entries_bkg = " << number_training_entries_bkg << endl;
+  cout << "\t number_test_entries_bkg     = " << number_test_entries_bkg     << endl;
+  cout << endl;
+  cout << "\t number_training_events_sig  = " << number_training_events_sig   << endl;
+  cout << "\t number_test_events_sig      = " << number_test_events_sig       << endl;
+  cout << "\t number_training_events_bkg  = " << number_training_events_bkg   << endl;
+  cout << "\t number_test_events_bkg      = " << number_test_events_bkg       << endl;
+  cout << endl;
+  cout << "\t nb entries sig              = " << number_training_entries_sig + number_test_entries_sig   << endl;
+  cout << "\t nb entries bkg              = " << number_training_entries_bkg + number_test_entries_bkg   << endl;
+  cout << "\t nb events sig               = " << number_training_events_sig  + number_test_events_sig    << endl;
+  cout << "\t nb events bkg               = " << number_training_events_bkg  + number_test_events_bkg    << endl;
+
+	// Clean up
+	delete factory;
+	delete dataloader;
+
 
 
 }
