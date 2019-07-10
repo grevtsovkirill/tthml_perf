@@ -63,4 +63,59 @@ int main( int argc, char **argv )
   dataloader->AddSpectator( "total_charge" );
   dataloader->AddSpectator( "lep_flavour" );
 
+  TChain *signal = new TChain("nominal");
+  signal->Add("../Files/skimmed/ttH.root");
+  TChain *background = new TChain("nominal");
+  background->Add("../Files/skimmed/ttW.root");
+
+
+
+  vector<Double_t> vars(InputVarSize); // vector has size of number of input variables
+
+  int number_training_entries_sig = 0;  int number_training_entries_bkg = 0;
+  int number_test_entries_sig = 0;  int number_test_entries_bkg = 0;
+  
+  double number_training_events_sig = 0.;  double number_training_events_bkg = 0.;
+  double number_test_events_sig     = 0.;  double number_test_events_bkg     = 0.;
+  
+  Float_t  max_eta                   ; signal->SetBranchAddress( "max_eta"                               , &max_eta                     );
+  Float_t lep_Eta_0                  ; signal->SetBranchAddress( "lep_Eta_0"                             , &lep_Eta_0                   );
+  Float_t lep_Eta_1                  ; signal->SetBranchAddress( "lep_Eta_1"                             , &lep_Eta_1                   );
+  Float_t lep_Pt_0                   ; signal->SetBranchAddress( "lep_Pt_0"                              , &lep_Pt_0                    );
+  Float_t lep_Pt_1                   ; signal->SetBranchAddress( "lep_Pt_1"                              , &lep_Pt_1                    );
+  Float_t Mll01                      ; signal->SetBranchAddress( "Mll01"                                 , &Mll01                       );
+  Float_t Meff                       ; signal->SetBranchAddress( "Meff"                                  , &Meff                        );
+  Float_t minDeltaR_LJ_0             ; signal->SetBranchAddress( "minDeltaR_LJ_0"                        , &minDeltaR_LJ_0              );
+  Float_t minDeltaR_LJ_1             ; signal->SetBranchAddress( "minDeltaR_LJ_1"                        , &minDeltaR_LJ_1              );
+  Float_t MET_RefFinal_et            ; signal->SetBranchAddress( "MET_RefFinal_et"                       , &MET_RefFinal_et             );
+  Int_t nJets_OR_T                   ; signal->SetBranchAddress( "nJets_OR_T"                            , &nJets_OR_T                  );
+  Int_t nJets_OR_T_MV2c10_70         ; signal->SetBranchAddress( "nJets_OR_T_MV2c10_70"                  , &nJets_OR_T_MV2c10_70        );
+  Int_t lep_flavour                  ; signal->SetBranchAddress( "lep_flavour"                           , &lep_flavour                 );
+  Int_t total_charge                 ; signal->SetBranchAddress( "total_charge"                          , &total_charge                );
+  Double_t weightS                   ; signal->SetBranchAddress( "weightS"                          , &weightS                );
+  ULong64_t EventNumber              ; signal->SetBranchAddress( "EventNumber"                           , &EventNumber                 );
+
+  Int_t evenodd = 0;
+  vars[0] = (float)max_eta;
+  vars[1] = (float)lep_Pt_1;
+  vars[2] = (float)Mll01;
+  vars[3] = (float)minDeltaR_LJ_0;
+  vars[4] = (float)minDeltaR_LJ_1;
+  vars[5] = (float)MET_RefFinal_et;
+  vars[6] = (float)((nJets_OR_T < 8) ? nJets_OR_T : 7);
+  vars[7] = (float)((nJets_OR_T_MV2c10_70 < 3) ? nJets_OR_T_MV2c10_70 : 2);
+  vars[8] = (float)lep_flavour;
+
+  for (UInt_t i=0; i<signal->GetEntries(); i++){
+    if (EventNumber%2 == evenodd){
+      dataloader->AddSignalTrainingEvent( vars, (weightS) );
+      number_training_entries_sig++;
+      number_training_events_sig += weightS;
+    }
+    else{
+      dataloader->AddSignalTestEvent    ( vars, (weightS) );
+      number_test_entries_sig++;
+      number_test_events_sig += weightS;
+    }
+  }      
 }
