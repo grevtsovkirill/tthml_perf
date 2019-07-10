@@ -1,3 +1,5 @@
 *.root
 *.exe
 *~
+Files/v9*
+Files/pre*
