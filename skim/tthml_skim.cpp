@@ -3,7 +3,7 @@
 void tthml_skim() {
 
 
-  TFile *oldfile = new TFile("Files/preskimmed/ttW_skim.root");
+  TFile *oldfile = new TFile("../Files/preskimmed/ttW_skim.root");
   TTree *oldtree = (TTree*)oldfile->Get("nominal");
   Long64_t nentries = oldtree->GetEntries();
   oldtree->SetBranchStatus("*",0);
@@ -32,6 +32,7 @@ void tthml_skim() {
   //finish weights
 
   //variables to test training:
+  oldtree->SetBranchStatus( "EventNumber"                 , 1);
   //leptons:
   oldtree->SetBranchStatus( "max_eta"                     , 1);
   oldtree->SetBranchStatus( "Mll01"                       , 1);
@@ -46,6 +47,7 @@ void tthml_skim() {
   oldtree->SetBranchStatus( "HT_lep"                      , 1);
   oldtree->SetBranchStatus( "DRll01"                      , 1);
   oldtree->SetBranchStatus( "DEtall01"                    , 1);
+  oldtree->SetBranchStatus( "total_charge"                , 1);
   //jets
   oldtree->SetBranchStatus( "DRlj00"                      , 1);
   oldtree->SetBranchStatus( "min_DRlj_new"                , 1);
