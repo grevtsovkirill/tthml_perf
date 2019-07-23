@@ -177,6 +177,11 @@ int main( int argc, char **argv )
   dataloader->PrepareTrainingAndTestTree( mycuts, mycutb,
 					  "nTest_Signal=0:nTrain_Background=0:NormMode=NumEvents" );
 
+  //Issues after first run
+  ////CreateMVAPdfs 
+  //// Error in macro "BDT.C": cannot find directory "Method_BDT" in file: out.root
+  ////+++ Could not locate directory 'Method_BDT; Could not locate directory 'Method_BDT' in file out.root
+
   TString Method_Opt;
   // ttbar Method_Opt = "!H:!V:NTrees=1000:MinNodeSize=1.5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=10:MaxDepth=1";
   Method_Opt = "!H:!V:NTrees=1000:MinNodeSize=1.5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:MaxDepth=2";
@@ -199,9 +204,9 @@ int main( int argc, char **argv )
   outputFile->Close();
   
   cout << "==> Wrote root file: " << outputFile->GetName() << endl
-	  << "==> TMVAClassificationCategory is done!" << endl
+       << "==> TMVAClassificationCategory is done!" << endl
        << endl
-	  << "==> To view the results, launch the GUI: \"root -l ./TMVAGui.C\"" << endl
+       << "==> To view the results, launch the GUI: \"root -l ./TMVAGui.C\"" << endl
        << endl;
   
   cout << "\t number_training_entries_sig = " << number_training_entries_sig << endl;
@@ -219,10 +224,10 @@ int main( int argc, char **argv )
   cout << "\t nb events sig               = " << number_training_events_sig  + number_test_events_sig    << endl;
   cout << "\t nb events bkg               = " << number_training_events_bkg  + number_test_events_bkg    << endl;
 
-	// Clean up
-	delete factory;
-	delete dataloader;
-
+  // Clean up
+  delete factory;
+  delete dataloader;
+  
 
 
 }
