@@ -1,17 +1,19 @@
-## Performance of model training for ttH-Multilepton analysis (2lSS)
+# Performance of model training for ttH-Multilepton analysis (2lSS)
 
-### Prepare samples:
-#### Skimm root ntuples
-Follow instructions from ```skim```:
-Output is lightweight root files with weights and input variables, could be found at ```Files/skimmed```.
-```ttH``` - signal, ```ttW``` - background.
-
-
-#### Convert root to flat file
-TBD
+## Prepare samples:
+### Skimm root ntuples
+Follow instructions from `skim`:
+Output is lightweight root files with weights and input variables, could be found at `Files/skimmed`.
+`ttH` - signal, `ttW` - background.
 
 
-### Model training :
+### Convert root to flat file
+Compare various options to access root files: [`format_change`](https://github.com/grevtsovkirill/tthml_perf/tree/master/format_change):
+ * `access_root` - use uproot and pandas
+ * `?!` 
+
+
+## Model training :
 `model_training` - contains various sets of training for ttH vs ttW.
 
  * `standard_tmva` - nominal training using C++:
@@ -25,7 +27,7 @@ TBD
          * Test NN implementation
  * Use industry-conventional tools:
 
-#### Reproduce BDT with TMVA
+### Reproduce BDT with TMVA
 Check nominal performance of the training with "fixed"-list of training variables used in current analysis.
 
 
