@@ -1,9 +1,7 @@
+void tthml_skim(string inname="ttH") {
 
 
-void tthml_skim() {
-
-
-  TFile *oldfile = new TFile("../Files/preskimmed/ttW_skim.root");
+  TFile *oldfile = new TFile(("../Files/preskimmed/"+inname+"_skim.root").c_str());
   TTree *oldtree = (TTree*)oldfile->Get("nominal");
   Long64_t nentries = oldtree->GetEntries();
   oldtree->SetBranchStatus("*",0);
@@ -70,7 +68,7 @@ void tthml_skim() {
   
   //Create a new file + a clone of old tree in new file
   //TFile *newfile = new TFile("tth.root","recreate");
-  TFile *newfile = new TFile("ttW.root","recreate");
+  TFile *newfile = new TFile((inname+".root").c_str(),"recreate");
   TTree *newtree = oldtree->CloneTree(0);
   Double_t weightS=1;
 
