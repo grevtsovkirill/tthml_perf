@@ -34,18 +34,3 @@ Compare various options to access root files: [`format_change`](https://github.c
          * dataframes, spark
 
    
-
-### Reproduce BDT with TMVA
-Check nominal performance of the training with "fixed"-list of training variables used in current analysis.
-
-
-#### T
-
-TBD: optimization of the selection of the input variables to the model.
-
-#### NN ?
-
-
-### Industry tools:
-#### scikit-learn DT
-BDT with ada-boost?
