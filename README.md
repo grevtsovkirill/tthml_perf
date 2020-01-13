@@ -25,7 +25,15 @@ Compare various options to access root files: [`format_change`](https://github.c
          * Cross Validation
          * Plot combined ROC curves
          * Test NN implementation
- * Use industry-conventional tools:
+ * `ml_packages` - Use set of various industry-conventional tools:
+     * Training setups
+         * Weak learners (different set of BDTs)
+	 * Neural Networks
+	 * Introduce multiclass for ttH
+     * Access setups
+         * dataframes, spark
+
+   
 
 ### Reproduce BDT with TMVA
 Check nominal performance of the training with "fixed"-list of training variables used in current analysis.
