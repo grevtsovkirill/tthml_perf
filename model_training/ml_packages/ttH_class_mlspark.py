@@ -72,8 +72,7 @@ def save_hist(hist_signal, hist_bkg,feature="Mll01",xlab='$m_{ll}$',ptitle="Dist
     ax.set_ylabel('counts')
     ax.set_title(ptitle)
     ax.legend()
-    plt.show()
-    plt.savefig("Plots/"+feature+".png", transparent=True)
+    plt.savefig("Plots/SparkOut/"+feature+".png", transparent=True)
 
 
 def main():
