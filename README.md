@@ -28,8 +28,8 @@ Compare various options to access root files: [`format_change`](https://github.c
  * `ml_packages` - Use set of various industry-conventional tools:
      * Training setups
          * Weak learners (different set of BDTs)
-	 * Neural Networks
-	 * Introduce multiclass for ttH
+         * Neural Networks
+         * Introduce multiclass for ttH
      * Access setups
          * dataframes, spark
 
