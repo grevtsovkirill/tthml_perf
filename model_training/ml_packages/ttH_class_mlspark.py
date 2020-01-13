@@ -31,6 +31,9 @@ def sel_vars(df,list_name="../VarList_30.json"):
     variablelist.append("label")
 
     DF = df[0].select(variablelist)
+    for df_ in df[1:]:
+        DF = DF.union(df_.select(variablelist))
+    print( 'Partitions: {}'.format(DF.rdd.getNumPartitions()))
     return DF
 
 def main():
@@ -40,7 +43,8 @@ def main():
     dfs=data_load(samples)
     print('There are',dfs[0].count(),' and ',dfs[1].count(),' events')
     dfsel=sel_vars(dfs)
-    dfsel.printSchema()
+    DF = dfsel.cache()
+    DF.printSchema()
     
 if __name__ == "__main__":
     session = pyspark.sql.SparkSession.builder.appName("Train ttH classifier").getOrCreate()
