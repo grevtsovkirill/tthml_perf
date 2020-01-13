@@ -5,6 +5,7 @@ import pyspark.sql
 from pyspark import SparkContext, SparkConf
 from pyspark.sql.functions import lit
 from samples_tthml import *
+import json
 
 def data_load(in_list):
     DFList = [] 
@@ -23,12 +24,24 @@ def data_load(in_list):
         DFList.append(tempDF)
     return DFList
 
+def sel_vars(df,list_name="../VarList_30.json"):
+    with open("../VarList_30.json") as vardict:
+        variablelist = json.load(vardict)[:]    
+    variablelist.append("sample")
+    variablelist.append("label")
+
+    DF = df[0].select(variablelist)
+    return DF
+
 def main():
 
     for s in samples:
         print(BASE,samples[s]['filename'])
-    data_load(samples)
-        
+    dfs=data_load(samples)
+    print('There are',dfs[0].count(),' and ',dfs[1].count(),' events')
+    dfsel=sel_vars(dfs)
+    dfsel.printSchema()
+    
 if __name__ == "__main__":
     session = pyspark.sql.SparkSession.builder.appName("Train ttH classifier").getOrCreate()
     main()
