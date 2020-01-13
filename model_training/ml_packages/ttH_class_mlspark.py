@@ -36,6 +36,19 @@ def sel_vars(df,list_name="../VarList_30.json"):
     print( 'Partitions: {}'.format(DF.rdd.getNumPartitions()))
     return DF
 
+
+def split_ds(df,train_frack=0.9):
+    balance_of_classes = df.filter(df['label'] == 0).count()/df.filter(df['label'] == 1).count()
+    if not(balance_of_classes > 0.5 and balance_of_classes < 1.5):
+        print("Not balanced ds, double check your split")
+        return None,None
+
+    print("rather balanced ds. split to it into train and test dataframes.")
+    train, test = df.randomSplit([train_frack,1-train_frack])
+    return  train, test       
+
+    
+        
 def main():
 
     for s in samples:
@@ -45,6 +58,8 @@ def main():
     dfsel=sel_vars(dfs)
     DF = dfsel.cache()
     DF.printSchema()
+
+    train,test=split_ds(DF)
     
 if __name__ == "__main__":
     session = pyspark.sql.SparkSession.builder.appName("Train ttH classifier").getOrCreate()
