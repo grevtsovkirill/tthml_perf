@@ -8,6 +8,7 @@ from pyspark.sql.functions import lit,col
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.classification import GBTClassifier
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+from sklearn.metrics import auc, roc_curve
 from samples_tthml import *
 import json
 import matplotlib.pyplot as plt
@@ -78,7 +79,17 @@ def save_hist(hist_signal, hist_bkg,feature="Mll01",xlab='$m_{ll}$',ptitle="Dist
     ax.legend()
     plt.savefig("Plots/SparkOut/"+feature+".png", transparent=True)
 
-
+def plot_roc_curve(fpr, tpr, auc):
+    plt.figure()
+    plt.plot([0,1], [0,1], 'k--', color='orange')
+    plt.plot(fpr, tpr, label='auc = {:.3f}'.format(auc))
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.title('BDT ROC curve')
+    plt.legend(loc='lower right')
+    plt.grid()
+    plt.savefig("Plots/SparkOut/ROC_bdt.png", transparent=True)
+    
 def main():
 
     for s in samples:
@@ -111,7 +122,16 @@ def main():
 
     evaluator = MulticlassClassificationEvaluator( labelCol="label", predictionCol="prediction", metricName="accuracy")
     accuracy = evaluator.evaluate(pred_gbt)
-    print(accuracy)
+    print("Accuracy: ",accuracy)
+
+    pred_pd_gbt['probability'] = pred_pd_gbt['probability'].map(lambda x: list(x))
+    pred_pd_gbt['encoded_label'] = pred_pd_gbt['label'].map(lambda x: np.eye(2)[int(x)])
+    y_pred_gbt = np.array(pred_pd_gbt['probability'].tolist())
+    y_true_gbt = np.array(pred_pd_gbt['encoded_label'].tolist())
+    fpr_gbt, tpr_gbt, threshold_gbt = roc_curve(y_score=y_pred_gbt[:,0], y_true=y_true_gbt[:,0])
+    auc_gbt = auc(fpr_gbt, tpr_gbt)
+    plot_roc_curve(fpr_gbt, tpr_gbt,auc_gbt)
+    print("AUC: ",auc_gbt)
     
 if __name__ == "__main__":
     session = pyspark.sql.SparkSession.builder.appName("Train ttH classifier").getOrCreate()
