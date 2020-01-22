@@ -1,10 +1,12 @@
 
 import sys, math
+import numpy as np
 
 import pyspark.sql
 from pyspark import SparkContext, SparkConf
 from pyspark.sql.functions import lit,col
 from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.classification import GBTClassifier
 from samples_tthml import *
 import json
 import matplotlib.pyplot as plt
@@ -98,6 +100,12 @@ def main():
     assembler = VectorAssembler(inputCols=feature_to_train, outputCol='features')
     train = assembler.transform(train)
     test = assembler.transform(test)
+
+    gbt = GBTClassifier(labelCol='label', featuresCol='features', maxIter=50, maxDepth=10)
+    %%time
+    gbt_model = gbt.fit(train)
+    pred_gbt = gbt_model.transform(test)
+    pred_pd_gbt = pred_gbt.select(['label', 'prediction', 'probability']).toPandas()
     
     
 if __name__ == "__main__":
