@@ -4,6 +4,7 @@ import sys, math
 import pyspark.sql
 from pyspark import SparkContext, SparkConf
 from pyspark.sql.functions import lit,col
+from pyspark.ml.feature import VectorAssembler
 from samples_tthml import *
 import json
 import matplotlib.pyplot as plt
@@ -88,6 +89,16 @@ def main():
     train,test=split_ds(DF)
     hist_signal, hist_bkg = compute_hist(data=train, feature='Mll01', target='label', n_bins=50, x_lim=[0,500000])
     save_hist(hist_signal, hist_bkg)
+
+    feature_to_train = train.columns
+    feature_to_train.remove('label')
+    feature_to_train.remove('sample')
+
+    
+    assembler = VectorAssembler(inputCols=feature_to_train, outputCol='features')
+    train = assembler.transform(train)
+    test = assembler.transform(test)
+    
     
 if __name__ == "__main__":
     session = pyspark.sql.SparkSession.builder.appName("Train ttH classifier").getOrCreate()
