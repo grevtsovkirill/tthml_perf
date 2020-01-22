@@ -7,6 +7,7 @@ from pyspark import SparkContext, SparkConf
 from pyspark.sql.functions import lit,col
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.classification import GBTClassifier
+from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 from samples_tthml import *
 import json
 import matplotlib.pyplot as plt
@@ -102,11 +103,15 @@ def main():
     test = assembler.transform(test)
 
     gbt = GBTClassifier(labelCol='label', featuresCol='features', maxIter=50, maxDepth=10)
-    %%time
+
+    print("Train BDT:")
     gbt_model = gbt.fit(train)
     pred_gbt = gbt_model.transform(test)
     pred_pd_gbt = pred_gbt.select(['label', 'prediction', 'probability']).toPandas()
-    
+
+    evaluator = MulticlassClassificationEvaluator( labelCol="label", predictionCol="prediction", metricName="accuracy")
+    accuracy = evaluator.evaluate(pred_gbt)
+    print(accuracy)
     
 if __name__ == "__main__":
     session = pyspark.sql.SparkSession.builder.appName("Train ttH classifier").getOrCreate()
