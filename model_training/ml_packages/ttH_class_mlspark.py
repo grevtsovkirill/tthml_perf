@@ -8,6 +8,7 @@ from pyspark.sql.functions import lit,col
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.classification import GBTClassifier
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
+from pyspark.ml.classification import GBTClassificationModel
 from sklearn.metrics import auc, roc_curve
 from samples_tthml import *
 import json
@@ -113,27 +114,35 @@ def main():
     train = assembler.transform(train)
     test = assembler.transform(test)
 
-    gbt = GBTClassifier(labelCol='label', featuresCol='features', maxIter=50, maxDepth=10)
+    if train_model:
+        gbt = GBTClassifier(labelCol='label', featuresCol='features', maxIter=50, maxDepth=10)
 
-    print("Train BDT:")
-    gbt_model = gbt.fit(train)
-    pred_gbt = gbt_model.transform(test)
-    pred_pd_gbt = pred_gbt.select(['label', 'prediction', 'probability']).toPandas()
+        print("Train BDT:")
+        gbt_model = gbt.fit(train)
+        pred_gbt = gbt_model.transform(test)
+        pred_pd_gbt = pred_gbt.select(['label', 'prediction', 'probability']).toPandas()
+        
+        evaluator = MulticlassClassificationEvaluator( labelCol="label", predictionCol="prediction", metricName="accuracy")
+        accuracy = evaluator.evaluate(pred_gbt)
+        print("Accuracy: ",accuracy)
 
-    evaluator = MulticlassClassificationEvaluator( labelCol="label", predictionCol="prediction", metricName="accuracy")
-    accuracy = evaluator.evaluate(pred_gbt)
-    print("Accuracy: ",accuracy)
+        pred_pd_gbt['probability'] = pred_pd_gbt['probability'].map(lambda x: list(x))
+        pred_pd_gbt['encoded_label'] = pred_pd_gbt['label'].map(lambda x: np.eye(2)[int(x)])
+        y_pred_gbt = np.array(pred_pd_gbt['probability'].tolist())
+        y_true_gbt = np.array(pred_pd_gbt['encoded_label'].tolist())
+        fpr_gbt, tpr_gbt, threshold_gbt = roc_curve(y_score=y_pred_gbt[:,0], y_true=y_true_gbt[:,0])
+        auc_gbt = auc(fpr_gbt, tpr_gbt)
+        plot_roc_curve(fpr_gbt, tpr_gbt,auc_gbt)
+        print("AUC: ",auc_gbt)
+        gbt_model.write().overwrite().save(path='models/bdt_spark_tth')
 
-    pred_pd_gbt['probability'] = pred_pd_gbt['probability'].map(lambda x: list(x))
-    pred_pd_gbt['encoded_label'] = pred_pd_gbt['label'].map(lambda x: np.eye(2)[int(x)])
-    y_pred_gbt = np.array(pred_pd_gbt['probability'].tolist())
-    y_true_gbt = np.array(pred_pd_gbt['encoded_label'].tolist())
-    fpr_gbt, tpr_gbt, threshold_gbt = roc_curve(y_score=y_pred_gbt[:,0], y_true=y_true_gbt[:,0])
-    auc_gbt = auc(fpr_gbt, tpr_gbt)
-    plot_roc_curve(fpr_gbt, tpr_gbt,auc_gbt)
-    print("AUC: ",auc_gbt)
-    gbt_model.write().overwrite().save(path='models/bdt_spark_tth')
+    else:
+        loaded_bdt=GBTClassificationModel.load('models/bdt_spark_tth')
+        pred_full = loaded_bdt.transform(test)
+        hist_signal_pred, hist_bkg_pred = compute_hist(data=pred_full, feature='Mll01', target='label', n_bins=50, x_lim=[0,500000])
+        
     
 if __name__ == "__main__":
     session = pyspark.sql.SparkSession.builder.appName("Train ttH classifier").getOrCreate()
+    train_model=False 
     main()
