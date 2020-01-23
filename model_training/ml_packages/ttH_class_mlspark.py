@@ -132,6 +132,7 @@ def main():
     auc_gbt = auc(fpr_gbt, tpr_gbt)
     plot_roc_curve(fpr_gbt, tpr_gbt,auc_gbt)
     print("AUC: ",auc_gbt)
+    gbt_model.write().overwrite().save(path='models/bdt_spark_tth')
     
 if __name__ == "__main__":
     session = pyspark.sql.SparkSession.builder.appName("Train ttH classifier").getOrCreate()
