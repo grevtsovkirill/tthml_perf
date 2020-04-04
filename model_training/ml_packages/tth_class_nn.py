@@ -52,11 +52,31 @@ def create_model(my_learning_rate):
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
+def train_model(model, train_features, train_label, epochs,
+                batch_size=None, validation_split=0.1):
+    history = model.fit(x=train_features, y=train_label, batch_size=batch_size,
+                      epochs=epochs, shuffle=True, 
+                      validation_split=validation_split)
+    epochs = history.epoch
+    hist = pd.DataFrame(history.history)
+
+    return epochs, hist
+
+
+
 def main():
 
     dfs=data_load(samples)
     X_train, X_test, y_train, y_test = pred_ds(dfs)
-    model = create_model(0.01)
 
+    learning_rate = 0.003
+    epochs = 50
+    batch_size = 4000
+    validation_split = 0.2
+
+    model = create_model(learning_rate)
+    epochs, hist = train_model(model, X_train, y_train, 
+                           epochs, batch_size, validation_split)
+    
 if __name__ == "__main__":
     main() 
