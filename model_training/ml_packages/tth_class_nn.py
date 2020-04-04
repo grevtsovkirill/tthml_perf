@@ -3,9 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import json
 
-#sklearn helpers 
+#sklearn helpers: 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+
+#keras imports:
+from keras.layers import Layer, Input, Dense, Dropout
+from keras.models import Sequential, load_model
 
 from samples_tthml import *
 
@@ -38,11 +42,21 @@ def pred_ds(dfs,test_samp_size=0.33):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = test_samp_size)
     return X_train, X_test, y_train, y_test
 
+def create_model(my_learning_rate):
+    dense_dim=len(sel_vars())
+    model = Sequential()
+    model.add(Dense(dense_dim, input_dim=dense_dim, activation='relu'))
+    model.add(Dropout(rate=0.1, noise_shape=None, seed=None))
+    model.add(Dense(50, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    return model
+
 def main():
 
     dfs=data_load(samples)
     X_train, X_test, y_train, y_test = pred_ds(dfs)
-
+    model = create_model(0.01)
 
 if __name__ == "__main__":
     main() 
