@@ -62,7 +62,24 @@ def train_model(model, train_features, train_label, epochs,
 
     return epochs, hist
 
-
+def plot_curve(epochs, hist, list_of_metrics,save=False):
+    plt.figure()
+    plt.xlabel("Epoch")
+    plt.ylabel("Value")
+    
+    for m in list_of_metrics:
+        x = hist[m]
+        plt.plot(epochs[1:], x[1:], label=m)
+    
+    plt.ylabel('cross-entropy loss',fontsize=14)
+    plt.xlabel('epochs',fontsize=14)
+    plt.legend()
+    if save:
+        plt.savefig("Plots/loss_NN_BDT_tth_ttw.png", transparent=True)
+    else:
+        plt.show()
+    
+    
 
 def main():
 
@@ -74,9 +91,15 @@ def main():
     batch_size = 4000
     validation_split = 0.2
 
-    model = create_model(learning_rate)
-    epochs, hist = train_model(model, X_train, y_train, 
+    mymodel = create_model(learning_rate)
+    epochs, hist = train_model(mymodel, X_train, y_train, 
                            epochs, batch_size, validation_split)
+
+    print("\n Evaluate the new model against the test set:")
+    print(mymodel.evaluate(X_test, y_test, batch_size=batch_size))
+
+    list_of_metrics_to_plot = ['loss','val_loss']
+    plot_curve(epochs, hist, list_of_metrics_to_plot)
     
 if __name__ == "__main__":
     main() 
